@@ -86,7 +86,6 @@
             background: #040406;
         }
 
-        /* Menü Katmanı */
         .overlay-menu {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -175,7 +174,6 @@
         }
         .start-action-btn:hover { transform: translateY(-2px); }
 
-        /* Game Over Paneli */
         #game-over-panel {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -212,7 +210,6 @@
         .action-btn.secondary { background: #222233; color: #fff; border: 1px solid #444; }
         .action-btn.secondary:hover { background: #33334d; }
 
-        /* Bildirim Toast */
         .toast {
             position: absolute;
             top: 15px; left: 50%;
@@ -242,7 +239,6 @@
         <div id="toast" class="toast">EFFECT ACTIVATED</div>
         <canvas id="gameCanvas" width="500" height="500"></canvas>
 
-        <!-- Menü -->
         <div id="menu-overlay" class="overlay-menu">
             <div class="menu-title">CONFIGURATION</div>
 
@@ -275,7 +271,6 @@
             <button class="start-action-btn" onclick="initGame()">INITIALIZE SYSTEM</button>
         </div>
 
-        <!-- Game Over Ekranı -->
         <div id="game-over-panel">
             <h2>SYSTEM CRASHED</h2>
             <div id="final-score">SCORE: 0</div>
@@ -310,6 +305,7 @@
     let gridSize = 20, blockSize = 25;
     let borderShrinkTimer = 0, activeShrink = 0;
     let matrixChanceUsed = false;
+    let gameTickCount = 0;
 
     function initGame() {
         document.getElementById("menu-overlay").classList.add("hidden");
@@ -319,6 +315,7 @@
         dx = 1; dy = 0; nextDx = 1; nextDy = 0;
         score = 0; activeShrink = 0; borderShrinkTimer = 0;
         matrixChanceUsed = false;
+        gameTickCount = 0;
         updateScore();
         spawnFood();
         enemies = [];
@@ -345,6 +342,7 @@
     });
 
     function gameLoop() {
+        gameTickCount++;
         dx = nextDx; dy = nextDy;
         let head = { x: snake[0].x + dx, y: snake[0].y + dy };
 
@@ -367,7 +365,7 @@
             }
         }
 
-        // Düşman Çarpışma Kontrolü (Düşman sana değerse ölürsün)
+        // Düşman Çarpışma Kontrolü
         for (let en of enemies) {
             if (head.x === en.x && head.y === en.y) {
                 if (tryMatrixSave()) return;
@@ -396,35 +394,40 @@
             }
         }
 
-        // Combat Modunda Akıllı Düşman Üretimi ve Takip Mantığı
+        // Combat Modu: Botlar yılanın hızının yarısında (her 2 adımda bir) hareket eder, böylece vurulabilirler!
         if (settings.mode === 'combat') {
-            if (Math.randomStr = Math.random() < 0.1 && enemies.length < 3) {
+            if (Math.random() < 0.12 && enemies.length < 3) {
                 enemies.push({
                     x: Math.random() < 0.5 ? activeShrink : maxLimit,
                     y: Math.floor(Math.random() * gridSize)
                 });
             }
 
-            // Düşmanlar yılanın kafasına doğru yavaşça hareket eder
-            enemies.forEach(en => {
-                if (en.x < snake[0].x) en.x++;
-                else if (en.x > snake[0].x) en.x--;
-                
-                if (en.y < snake[0].y) en.y++;
-                else if (en.y > snake[0].y) en.y--;
-            });
+            if (gameTickCount % 2 === 0) {
+                enemies.forEach(en => {
+                    if (en.x < snake[0].x) en.x++;
+                    else if (en.x > snake[0].x) en.x--;
+                    
+                    if (en.y < snake[0].y) en.y++;
+                    else if (en.y > snake[0].y) en.y--;
+                });
+            }
         }
 
-        // Düşmanın kendi kuyruğuna çarpıp yok olması
+        // Düşmanları Kuyrukla veya Üzerinden Geçerek Yok Etme
         enemies.forEach((en, idx) => {
+            let destroyed = false;
             snake.forEach(part => {
-                if (en.x === part.x && en.y === part.y) {
-                    enemies.splice(idx, 1);
-                    score += 50;
-                    updateScore();
-                    showToast("ENEMY DESTROYED BY TAIL!");
-                }
+                if (en.x === part.x && en.y === part.y) destroyed = true;
             });
+            if (en.x === head.x && en.y === head.y) destroyed = true;
+
+            if (destroyed) {
+                enemies.splice(idx, 1);
+                score += 50;
+                updateScore();
+                showToast("ENEMY DESTROYED!");
+            }
         });
 
         draw();
@@ -479,11 +482,9 @@
             ctx.strokeRect(activeShrink * blockSize, activeShrink * blockSize, (gridSize - activeShrink * 2) * blockSize, (gridSize - activeShrink * 2) * blockSize);
         }
 
-        // Yem Çizimi
         ctx.fillStyle = food.type === 'special' ? '#ff9900' : '#ff0055';
         ctx.fillRect(food.x * blockSize + 2, food.y * blockSize + 2, blockSize - 4, blockSize - 4);
 
-        // Takip Eden Düşmanlar (Parlak Neon Mor)
         ctx.shadowColor = "#bf00ff";
         ctx.shadowBlur = 12;
         ctx.fillStyle = "#bf00ff";
