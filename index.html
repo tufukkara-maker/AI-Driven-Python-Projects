@@ -15,6 +15,7 @@
             --accent-blue: #00bfff;
             --accent-pink: #ff007f;
             --accent-orange: #ff9900;
+            --accent-purple: #bf00ff;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
@@ -196,11 +197,20 @@
 
         #final-score { font-size: 18px; margin-bottom: 20px; color: #aaa; }
 
-        .restart-btn {
-            background: #fff; color: #000; border: none;
-            padding: 10px 24px; border-radius: 6px; font-weight: 700; cursor: pointer; transition: 0.2s;
+        .gameover-buttons {
+            display: flex;
+            gap: 10px;
         }
-        .restart-btn:hover { background: var(--accent-green); }
+
+        .action-btn {
+            background: #fff; color: #000; border: none;
+            padding: 10px 20px; border-radius: 6px; font-weight: 700; cursor: pointer; transition: 0.2s;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 13px;
+        }
+        .action-btn:hover { background: var(--accent-green); }
+        .action-btn.secondary { background: #222233; color: #fff; border: 1px solid #444; }
+        .action-btn.secondary:hover { background: #33334d; }
 
         /* Bildirim Toast */
         .toast {
@@ -269,7 +279,10 @@
         <div id="game-over-panel">
             <h2>SYSTEM CRASHED</h2>
             <div id="final-score">SCORE: 0</div>
-            <button class="restart-btn" onclick="returnToMenu()">MAIN MENU</button>
+            <div class="gameover-buttons">
+                <button class="action-btn" onclick="initGame()">RESTART</button>
+                <button class="action-btn secondary" onclick="returnToMenu()">MAIN MENU</button>
+            </div>
         </div>
     </div>
 </div>
@@ -292,7 +305,7 @@
     }
 
     let snake = [], dx = 1, dy = 0, nextDx = 1, nextDy = 0;
-    let food = {}, specialItems = [], enemies = [];
+    let food = {}, enemies = [];
     let score = 0, gameInterval, isPlaying = false;
     let gridSize = 20, blockSize = 25;
     let borderShrinkTimer = 0, activeShrink = 0;
@@ -308,23 +321,23 @@
         matrixChanceUsed = false;
         updateScore();
         spawnFood();
-        specialItems = [];
         enemies = [];
 
         if (gameInterval) clearInterval(gameInterval);
         gameInterval = setInterval(gameLoop, 100);
+        isPlaying = true;
     }
 
     function spawnFood() {
         food = {
             x: Math.floor(Math.random() * (gridSize - activeShrink * 2)) + activeShrink,
             y: Math.floor(Math.random() * (gridSize - activeShrink * 2)) + activeShrink,
-            type: Math.random() < 0.2 ? 'special' : 'normal' // %20 ihtimalle özel yem (Metabolizma)
+            type: Math.random() < 0.2 ? 'special' : 'normal'
         };
     }
 
     window.addEventListener("keydown", e => {
-        if (!isPlaying && document.getElementById("menu-overlay").classList.contains("hidden") == false) return;
+        if (!isPlaying) return;
         if ((e.key === "ArrowUp" || e.key === "w") && dy === 0) { nextDx = 0; nextDy = -1; e.preventDefault(); }
         if ((e.key === "ArrowDown" || e.key === "s") && dy === 0) { nextDx = 0; nextDy = 1; e.preventDefault(); }
         if ((e.key === "ArrowLeft" || e.key === "a") && dx === 0) { nextDx = -1; nextDy = 0; e.preventDefault(); }
@@ -335,19 +348,17 @@
         dx = nextDx; dy = nextDy;
         let head = { x: snake[0].x + dx, y: snake[0].y + dy };
 
-        // Sınır ve Mod Kontrolleri
         let minLimit = activeShrink;
         let maxLimit = gridSize - 1 - activeShrink;
 
         if (settings.mode === 'classic' || settings.mode === 'shrinking' || settings.mode === 'combat') {
             if (head.x < minLimit || head.x > maxLimit || head.y < minLimit || head.y > maxLimit) {
-                if (tryMatrixSave()) return; // 2. Kural: Matrix Kurtarış Şansı
+                if (tryMatrixSave()) return;
                 triggerGameOver();
                 return;
             }
         }
 
-        // Kendine çarpma
         for (let part of snake) {
             if (head.x === part.x && head.y === part.y) {
                 if (tryMatrixSave()) return;
@@ -358,19 +369,15 @@
 
         snake.unshift(head);
 
-        // Yem Yeme Kontrolü
         if (head.x === food.x && head.y === food.y) {
             score += food.type === 'special' ? 30 : 10;
-            if (food.type === 'special') {
-                applyMetabolismEffect();
-            }
+            if (food.type === 'special') applyMetabolismEffect();
             updateScore();
             spawnFood();
         } else {
             snake.pop();
         }
 
-        // 4. Kural: Shrinking Modu (Daralan Sahne)
         if (settings.mode === 'shrinking') {
             borderShrinkTimer++;
             if (borderShrinkTimer > 35 && activeShrink < 4) {
@@ -380,19 +387,18 @@
             }
         }
 
-        // 5. Kural: Combat Modu (Düşmanlar)
-        if (settings.mode === 'combat' && Math.random() < 0.05 && enemies.length < 3) {
+        if (settings.mode === 'combat' && Math.random() < 0.08 && enemies.length < 3) {
             enemies.push({
-                x: Math.floor(Math.random() * gridSize),
-                y: Math.floor(Math.random() * gridSize)
+                x: Math.floor(Math.random() * (gridSize - 2)) + 1,
+                y: Math.floor(Math.random() * (gridSize - 2)) + 1
             });
         }
 
-        // Düşman Çarpışma Kontrolü
         enemies.forEach((en, idx) => {
             if (head.x === en.x && head.y === en.y) {
                 enemies.splice(idx, 1);
                 score += 50;
+                updateScore();
                 showToast("ENEMY DESTROYED!");
             }
         });
@@ -400,12 +406,10 @@
         draw();
     }
 
-    // 2. Kural: Matrix Şansı (Ölmek üzereyken %15 ihtimalle rastgele güvenli bir yöne kaydırır)
     function tryMatrixSave() {
         if (!matrixChanceUsed && Math.random() < 0.15) {
             matrixChanceUsed = true;
             showToast("CRITICAL SAVE! MATRIX ACTIVE");
-            // Güvenli bir hamle bul
             const safeDirs = [{x:0, y:-1}, {x:0, y:1}, {x:-1, y:0}, {x:1, y:0}];
             for (let d of safeDirs) {
                 let testHead = { x: snake[0].x + d.x, y: snake[0].y + d.y };
@@ -421,7 +425,6 @@
         return false;
     }
 
-    // 3. Kural: Metabolizma Efektleri
     function applyMetabolismEffect() {
         const effects = ["SPEED BOOST", "BODY SHRINK", "BONUS POINTS"];
         let choice = effects[Math.floor(Math.random() * effects.length)];
@@ -446,7 +449,6 @@
         ctx.fillStyle = "#040406";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Daralan Sınırları Çiz
         if (activeShrink > 0) {
             ctx.strokeStyle = "rgba(255,0,127,0.4)";
             ctx.lineWidth = 2;
@@ -457,13 +459,15 @@
         ctx.fillStyle = food.type === 'special' ? '#ff9900' : '#ff0055';
         ctx.fillRect(food.x * blockSize + 2, food.y * blockSize + 2, blockSize - 4, blockSize - 4);
 
-        // Düşmanlar
-        ctx.fillStyle = '#aa00ff';
+        // Düşmanlar (Parlak Neon Mor Tehdit Küpleri)
+        ctx.shadowColor = "#bf00ff";
+        ctx.shadowBlur = 10;
+        ctx.fillStyle = "#bf00ff";
         enemies.forEach(en => {
             ctx.fillRect(en.x * blockSize + 2, en.y * blockSize + 2, blockSize - 4, blockSize - 4);
         });
+        ctx.shadowBlur = 0; // Gölgeyi sıfırla
 
-        // 1. Kural: Fluid Wave (Pürüzsüz Eğrisel Akış) veya Grid Snap
         let palette = palettes[settings.color];
         if (settings.physics === 'fluid') {
             ctx.strokeStyle = palette.head;
@@ -487,6 +491,7 @@
     }
 
     function triggerGameOver() {
+        isPlaying = false;
         clearInterval(gameInterval);
         document.getElementById("final-score").innerText = `SCORE: ${score}`;
         document.getElementById("game-over-panel").style.display = "flex";
