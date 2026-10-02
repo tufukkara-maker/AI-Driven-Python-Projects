@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -101,7 +101,6 @@
         }
         .toggle-btn:hover { color: #fff; }
 
-        /* Güç Barı */
         .strength-meter {
             height: 6px;
             width: 100%;
@@ -129,7 +128,6 @@
 
         #security-level { color: var(--accent-pink); }
 
-        /* Öneriler ve Kriterler Listesi */
         .criteria-list {
             display: flex;
             flex-direction: column;
@@ -153,7 +151,6 @@
         .criterion::before { content: "✕"; font-weight: bold; }
         .criterion.met::before { content: "✓"; }
 
-        /* Butonlar */
         .action-buttons {
             display: flex;
             gap: 10px;
@@ -194,16 +191,16 @@
     </div>
 
     <div class="input-group">
-        <label>Şifrenizi Girin</label>
+        <label>Enter Password</label>
         <div class="password-wrapper">
-            <input type="password" id="passwordInput" placeholder="Güvenlik anahtarınızı yazın..." oninput="analyzePassword()">
-            <button class="toggle-btn" onclick="toggleVisibility()">GÖSTER</button>
+            <input type="password" id="passwordInput" placeholder="Type your security key..." oninput="analyzePassword()">
+            <button class="toggle-btn" onclick="toggleVisibility()">SHOW</button>
         </div>
     </div>
 
     <div class="status-box">
-        <span>GÜVENLİK DERECESİ:</span>
-        <span id="security-level">ANALİZ EDİLİYOR...</span>
+        <span>SECURITY LEVEL:</span>
+        <span id="security-level">WAITING...</span>
     </div>
 
     <div class="strength-meter">
@@ -214,16 +211,16 @@
     </div>
 
     <div class="criteria-list">
-        <div class="criterion" id="crit-length">En az 8 karakter uzunluğunda</div>
-        <div class="criterion" id="crit-upper">Büyük harf (A-Z) içeriyor</div>
-        <div class="criterion" id="crit-lower">Küçük harf (a-z) içeriyor</div>
-        <div class="criterion" id="crit-number">Rakam (0-9) içeriyor</div>
-        <div class="criterion" id="crit-symbol">Özel karakter (!@#$...) içeriyor</div>
+        <div class="criterion" id="crit-length">At least 8 characters long</div>
+        <div class="criterion" id="crit-upper">Contains uppercase letter (A-Z)</div>
+        <div class="criterion" id="crit-lower">Contains lowercase letter (a-z)</div>
+        <div class="criterion" id="crit-number">Contains number (0-9)</div>
+        <div class="criterion" id="crit-symbol">Contains special character (!@#$...)</div>
     </div>
 
     <div class="action-buttons">
-        <button class="btn primary" onclick="generatePassword()">GÜÇLÜ ŞİFRE OLUŞTUR</button>
-        <button class="btn" onclick="copyPassword()">KOPYALA</button>
+        <button class="btn primary" onclick="generatePassword()">GENERATE PASSWORD</button>
+        <button class="btn" onclick="copyPassword()">COPY</button>
     </div>
 </div>
 
@@ -271,34 +268,33 @@
             document.getElementById("bar4")
         ];
 
-        // Renkleri sıfırla
         bars.forEach(b => b.style.background = "#222233");
 
         if (length === 0) {
-            levelEl.innerText = "BEKLENİYOR";
+            levelEl.innerText = "WAITING";
             levelEl.style.color = "#8888a0";
             return;
         }
 
         let activeBars = 0;
-        let text = "ÇOK ZAYIF";
+        let text = "VERY WEAK";
         let color = "#ff007f";
 
         if (score <= 2) {
             activeBars = 1;
-            text = "ZAYIF";
+            text = "WEAK";
             color = "#ff007f";
         } else if (score === 3 || score === 4) {
             activeBars = 3;
-            text = "ORTA";
+            text = "MEDIUM";
             color = "#ff9900";
         } else if (score === 5 && length >= 12) {
             activeBars = 4;
-            text = "KUSURSUZ";
+            text = "SECURE";
             color = "#00ffcc";
         } else if (score === 5) {
             activeBars = 3;
-            text = "GÜÇLÜ";
+            text = "STRONG";
             color = "#00bfff";
         }
 
@@ -315,33 +311,30 @@
         const btn = document.querySelector(".toggle-btn");
         if (input.type === "password") {
             input.type = "text";
-            btn.innerText = "GİZLE";
+            btn.innerText = "HIDE";
         } else {
             input.type = "password";
-            btn.innerText = "GÖSTER";
+            btn.innerText = "SHOW";
         }
     }
 
     function generatePassword() {
         const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*!+=?";
         let pwd = "";
-        // Garanti olsun diye her kategoriden en az birer tane koyuyoruz
         pwd += "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[Math.floor(Math.random() * 26)];
         pwd += "abcdefghijklmnopqrstuvwxyz"[Math.floor(Math.random() * 26)];
         pwd += "0123456789"[Math.floor(Math.random() * 10)];
         pwd += "@#$%&*!+=?"[Math.floor(Math.random() * 10)];
 
-        // Kalan karakterleri rastgele tamamla (toplam 14 karakter)
         for (let i = 4; i < 14; i++) {
             pwd += chars[Math.floor(Math.random() * chars.length)];
         }
 
-        // Karıştır
         pwd = pwd.split('').sort(() => 0.5 - Math.random()).join('');
 
         const input = document.getElementById("passwordInput");
         input.type = "text";
-        document.querySelector(".toggle-btn").innerText = "GİZLE";
+        document.querySelector(".toggle-btn").innerText = "HIDE";
         input.value = pwd;
         analyzePassword();
     }
@@ -350,7 +343,7 @@
         const input = document.getElementById("passwordInput");
         if (!input.value) return;
         navigator.clipboard.writeText(input.value);
-        alert("Şifre panoya kopyalandı!");
+        alert("Password copied to clipboard!");
     }
 </script>
 
