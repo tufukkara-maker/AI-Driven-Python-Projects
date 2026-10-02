@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEON PULSE // SNAKE</title>
+    <title>PULSE // SNAKE REMIXED</title>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=VT323&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-deep: #08080c;
-            --panel-bg: #12121a;
-            --border-col: #222233;
+            --bg-deep: #060609;
+            --panel-bg: #101018;
+            --border-col: #1e1e2f;
             --text-main: #e2e2ef;
             --accent-green: #00ffcc;
             --accent-blue: #00bfff;
@@ -28,8 +28,7 @@
             align-items: center;
             min-height: 100vh;
             overflow: hidden;
-            /* Hafif CRT tarama çizgisi dokusu */
-            background-image: linear-gradient(rgba(18, 18, 26, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+            background-image: linear-gradient(rgba(12, 12, 20, 0) 50%, rgba(0, 0, 0, 0.3) 50%);
             background-size: 100% 4px;
         }
 
@@ -39,17 +38,16 @@
             border: 3px solid var(--border-col);
             border-radius: 16px;
             padding: 24px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 30px rgba(0,0,0,0.5);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.9), inset 0 0 40px rgba(0,0,0,0.6);
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
-        /* Başlık Alanı */
         .arcade-header {
             display: flex;
             justify-content: space-between;
-            width: 480px;
+            width: 500px;
             margin-bottom: 16px;
             align-items: flex-end;
             border-bottom: 2px dashed var(--border-col);
@@ -57,26 +55,25 @@
         }
 
         .logo h1 {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 700;
             letter-spacing: 2px;
             color: #fff;
             text-shadow: 0 0 10px rgba(255,255,255,0.3);
         }
-        .logo span { color: var(--accent-green); font-family: 'VT323', monospace; font-size: 20px; }
+        .logo span { color: var(--accent-green); font-family: 'VT323', monospace; font-size: 18px; }
 
         .stats-display {
             font-family: 'VT323', monospace;
-            font-size: 24px;
+            font-size: 26px;
             letter-spacing: 1px;
             color: var(--accent-blue);
         }
 
-        /* Ekranlar (Menü / Oyun) */
         .screen-container {
             position: relative;
-            width: 480px;
-            height: 480px;
+            width: 500px;
+            height: 500px;
             background: #040406;
             border: 2px solid var(--border-col);
             border-radius: 8px;
@@ -85,20 +82,20 @@
 
         canvas {
             display: block;
-            background: #050508;
+            background: #040406;
         }
 
         /* Menü Katmanı */
         .overlay-menu {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(8, 8, 12, 0.92);
-            backdrop-filter: blur(5px);
+            background: rgba(6, 6, 9, 0.95);
+            backdrop-filter: blur(8px);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 30px;
+            padding: 25px;
             z-index: 10;
             transition: opacity 0.3s ease;
         }
@@ -109,23 +106,23 @@
         }
 
         .menu-title {
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 700;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             color: #fff;
             text-shadow: 0 0 15px var(--accent-green);
         }
 
         .setting-group {
             width: 100%;
-            margin-bottom: 14px;
+            margin-bottom: 12px;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 4px;
         }
 
         .setting-label {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -134,66 +131,54 @@
 
         .setting-options {
             display: flex;
-            gap: 8px;
+            gap: 6px;
         }
 
         .option-btn {
             flex: 1;
-            background: #1a1a24;
+            background: #151520;
             border: 1px solid var(--border-col);
             color: var(--text-main);
-            padding: 10px;
+            padding: 8px;
             border-radius: 6px;
             font-family: 'Space Grotesk', sans-serif;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
         }
 
-        .option-btn:hover {
-            border-color: #555;
-            background: #252535;
-        }
-
+        .option-btn:hover { border-color: #555; background: #202030; }
         .option-btn.active {
             background: var(--accent-green);
             color: #000;
             border-color: var(--accent-green);
-            box-shadow: 0 0 10px rgba(0,255,204,0.4);
+            box-shadow: 0 0 10px rgba(0,255,204,0.3);
         }
 
         .start-action-btn {
             width: 100%;
-            margin-top: 20px;
+            margin-top: 15px;
             background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
             color: #000;
             border: none;
-            padding: 14px;
+            padding: 12px;
             border-radius: 8px;
             font-family: 'Space Grotesk', sans-serif;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 700;
             cursor: pointer;
             letter-spacing: 1px;
             box-shadow: 0 5px 20px rgba(0,191,255,0.3);
-            transition: transform 0.1s, box-shadow 0.2s;
+            transition: transform 0.1s;
         }
-
-        .start-action-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0,191,255,0.5);
-        }
-
-        .start-action-btn:active {
-            transform: translateY(1px);
-        }
+        .start-action-btn:hover { transform: translateY(-2px); }
 
         /* Game Over Paneli */
         #game-over-panel {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
+            background: rgba(0,0,0,0.9);
             display: none;
             flex-direction: column;
             justify-content: center;
@@ -202,52 +187,32 @@
         }
 
         #game-over-panel h2 {
-            font-size: 36px;
+            font-size: 34px;
             color: var(--accent-pink);
             font-family: 'VT323', monospace;
             letter-spacing: 2px;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
-        #final-score {
-            font-size: 20px;
-            margin-bottom: 25px;
-            color: #aaa;
-        }
+        #final-score { font-size: 18px; margin-bottom: 20px; color: #aaa; }
 
         .restart-btn {
-            background: #fff;
-            color: #000;
-            border: none;
-            padding: 12px 28px;
-            border-radius: 6px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: 0.2s;
+            background: #fff; color: #000; border: none;
+            padding: 10px 24px; border-radius: 6px; font-weight: 700; cursor: pointer; transition: 0.2s;
         }
         .restart-btn:hover { background: var(--accent-green); }
 
         /* Bildirim Toast */
         .toast {
             position: absolute;
-            top: 15px;
-            left: 50%;
-            transform: translateX(-50%) translateY(-50px);
-            background: rgba(0, 255, 204, 0.9);
-            color: #000;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 700;
-            opacity: 0;
-            transition: transform 0.3s, opacity 0.3s;
-            pointer-events: none;
-            z-index: 20;
+            top: 15px; left: 50%;
+            transform: translateX(-50%) translateY(-40px);
+            background: rgba(0, 255, 204, 0.95);
+            color: #000; padding: 5px 14px; border-radius: 20px;
+            font-size: 11px; font-weight: 700; opacity: 0;
+            transition: transform 0.3s, opacity 0.3s; pointer-events: none; z-index: 20;
         }
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-        }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
     </style>
 </head>
 <body>
@@ -255,8 +220,8 @@
 <div class="arcade-cabinet">
     <div class="arcade-header">
         <div class="logo">
-            <h1 id="ui-brand">PULSE // SNAKE</h1>
-            <span id="ui-subbrand">SYSTEM v1.2</span>
+            <h1>PULSE // SNAKE</h1>
+            <span>REMIXED EDITION</span>
         </div>
         <div class="stats-display">
             <span id="score-display">0000</span>
@@ -264,18 +229,15 @@
     </div>
 
     <div class="screen-container">
-        <div id="toast" class="toast">LEVEL UP!</div>
-        
-        <!-- Oyun Alanı Canvas -->
-        <canvas id="gameCanvas" width="480" height="480"></canvas>
+        <div id="toast" class="toast">EFFECT ACTIVATED</div>
+        <canvas id="gameCanvas" width="500" height="500"></canvas>
 
-        <!-- Özelleştirme Menüsü -->
+        <!-- Menü -->
         <div id="menu-overlay" class="overlay-menu">
-            <div class="menu-title" id="menu-heading">SETTINGS</div>
+            <div class="menu-title">CONFIGURATION</div>
 
-            <!-- Renk Seçimi -->
             <div class="setting-group">
-                <span class="setting-label" id="lbl-color">Yılan Rengi / Snake Color</span>
+                <span class="setting-label">Snake Color</span>
                 <div class="setting-options">
                     <button class="option-btn active" onclick="setOpt('color', 0, this)">Neon Mint</button>
                     <button class="option-btn" onclick="setOpt('color', 1, this)">Cyber Blue</button>
@@ -283,42 +245,31 @@
                 </div>
             </div>
 
-            <!-- Harita Boyutu -->
             <div class="setting-group">
-                <span class="setting-label" id="lbl-grid">Harita Boyutu / Grid Size</span>
+                <span class="setting-label">Game Mode</span>
                 <div class="setting-options">
-                    <button class="option-btn" onclick="setOpt('grid', 0, this)">Küçük (15x15)</button>
-                    <button class="option-btn active" onclick="setOpt('grid', 1, this)">Orta (20x20)</button>
-                    <button class="option-btn" onclick="setOpt('grid', 2, this)">Büyük (25x25)</button>
+                    <button class="option-btn active" onclick="setOpt('mode', 'classic', this)">Classic</button>
+                    <button class="option-btn" onclick="setOpt('mode', 'shrinking', this)">Shrinking</button>
+                    <button class="option-btn" onclick="setOpt('mode', 'combat', this)">Combat</button>
                 </div>
             </div>
 
-            <!-- Oyun Modu -->
             <div class="setting-group">
-                <span class="setting-label" id="lbl-mode">Oyun Modu / Game Mode</span>
+                <span class="setting-label">Movement Physics</span>
                 <div class="setting-options">
-                    <button class="option-btn active" onclick="setOpt('mode', 0, this)">Klasik</button>
-                    <button class="option-btn" onclick="setOpt('mode', 1, this)">Duvar Geçme</button>
+                    <button class="option-btn active" onclick="setOpt('physics', 'grid', this)">Grid Snap</button>
+                    <button class="option-btn" onclick="setOpt('physics', 'fluid', this)">Fluid Wave</button>
                 </div>
             </div>
 
-            <!-- Dil Seçimi -->
-            <div class="setting-group">
-                <span class="setting-label">Dil / Language</span>
-                <div class="setting-options">
-                    <button class="option-btn active" onclick="setLanguage('tr', this)">Türkçe</button>
-                    <button class="option-btn" onclick="setLanguage('en', this)">English</button>
-                </div>
-            </div>
-
-            <button class="start-action-btn" id="start-btn-text" onclick="initGame()">OYUNU BAŞLAT</button>
+            <button class="start-action-btn" onclick="initGame()">INITIALIZE SYSTEM</button>
         </div>
 
         <!-- Game Over Ekranı -->
         <div id="game-over-panel">
-            <h2 id="go-title">SİSTEM HATASI</h2>
-            <div id="final-score">SKOR: 0</div>
-            <button class="restart-btn" id="go-btn" onclick="returnToMenu()">MENÜYE DÖN</button>
+            <h2>SYSTEM CRASHED</h2>
+            <div id="final-score">SCORE: 0</div>
+            <button class="restart-btn" onclick="returnToMenu()">MAIN MENU</button>
         </div>
     </div>
 </div>
@@ -327,112 +278,79 @@
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
 
-    // Dil Veritabanı
-    const langData = {
-        tr: { heading: "AYARLAR", start: "OYUNU BAŞLAT", goTitle: "SİSTEM ÇÖKTÜ", scoreText: "SKOR:", restart: "TEKRAR DENE" },
-        en: { heading: "SETTINGS", start: "START GAME", goTitle: "SYSTEM CRASH", scoreText: "SCORE:", restart: "TRY AGAIN" }
-    };
-    let currentLang = 'tr';
-
-    // Seçenekler Durumu
-    let gameSettings = {
-        color: 0, // 0: Mint, 1: Blue, 2: Pink
-        grid: 1,  // 0: 15, 1: 20, 2: 25
-        mode: 0   // 0: Klasik, 1: Duvar Geçme
-    };
-
-    const colorPalettes = [
-        { head: "#00ffcc", body: "#00b38f", glow: "rgba(0,255,204,0.4)" },
-        { head: "#00bfff", body: "#0080ff", glow: "rgba(0,191,255,0.4)" },
-        { head: "#ff007f", body: "#b30059", glow: "rgba(255,0,127,0.4)" }
+    let settings = { color: 0, mode: 'classic', physics: 'grid' };
+    const palettes = [
+        { head: "#00ffcc", body: "#00b38f" },
+        { head: "#00bfff", body: "#0080ff" },
+        { head: "#ff007f", body: "#b30059" }
     ];
 
-    const gridSizes = [15, 20, 25];
-
-    function setOpt(type, val, btnElem) {
-        gameSettings[type] = val;
-        // Aynı gruptaki butonların active sınıfını kaldır
-        let parent = btnElem.parentElement;
-        Array.from(parent.children).forEach(child => child.classList.remove('active'));
-        btnElem.classList.add('active');
+    function setOpt(type, val, btn) {
+        settings[type] = val;
+        Array.from(btn.parentElement.children).forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
     }
 
-    function setLanguage(lang, btnElem) {
-        currentLang = lang;
-        let parent = btnElem.parentElement;
-        Array.from(parent.children).forEach(child => child.classList.remove('active'));
-        btnElem.classList.add('active');
-
-        // Arayüz metinlerini güncelle
-        let t = langData[currentLang];
-        document.getElementById("menu-heading").innerText = t.heading;
-        document.getElementById("start-btn-text").innerText = t.start;
-        document.getElementById("go-title").innerText = t.goTitle;
-        document.getElementById("go-btn").innerText = t.restart;
-    }
-
-    // Oyun Değişkenleri
-    let snake, dx, dy, nextDx, nextDy, food, score, gameInterval, gridSize, blockSize;
-    let isPlaying = false;
+    let snake = [], dx = 1, dy = 0, nextDx = 1, nextDy = 0;
+    let food = {}, specialItems = [], enemies = [];
+    let score = 0, gameInterval, isPlaying = false;
+    let gridSize = 20, blockSize = 25;
+    let borderShrinkTimer = 0, activeShrink = 0;
+    let matrixChanceUsed = false;
 
     function initGame() {
         document.getElementById("menu-overlay").classList.add("hidden");
         document.getElementById("game-over-panel").style.display = "none";
 
-        gridSize = gridSizes[gameSettings.grid];
-        blockSize = 480 / gridSize;
-
-        snake = [
-            { x: Math.floor(gridSize / 2), y: Math.floor(gridSize / 2) },
-            { x: Math.floor(gridSize / 2) - 1, y: Math.floor(gridSize / 2) }
-        ];
-        dx = 1; dy = 0;
-        nextDx = 1; nextDy = 0;
-        score = 0;
-        updateScoreDisplay();
+        snake = [{x: 10, y: 10}, {x: 9, y: 10}, {x: 8, y: 10}];
+        dx = 1; dy = 0; nextDx = 1; nextDy = 0;
+        score = 0; activeShrink = 0; borderShrinkTimer = 0;
+        matrixChanceUsed = false;
+        updateScore();
         spawnFood();
+        specialItems = [];
+        enemies = [];
 
-        isPlaying = true;
         if (gameInterval) clearInterval(gameInterval);
-        gameInterval = setInterval(gameLoop, 110);
+        gameInterval = setInterval(gameLoop, 100);
     }
 
     function spawnFood() {
         food = {
-            x: Math.floor(Math.random() * gridSize),
-            y: Math.floor(Math.random() * gridSize)
+            x: Math.floor(Math.random() * (gridSize - activeShrink * 2)) + activeShrink,
+            y: Math.floor(Math.random() * (gridSize - activeShrink * 2)) + activeShrink,
+            type: Math.random() < 0.2 ? 'special' : 'normal' // %20 ihtimalle özel yem (Metabolizma)
         };
-        snake.forEach(part => {
-            if (part.x === food.x && part.y === food.y) spawnFood();
-        });
     }
 
     window.addEventListener("keydown", e => {
-        if (!isPlaying) return;
-        if ((e.key === "ArrowUp" || e.key === "w" || e.key === "W") && dy === 0) { nextDx = 0; nextDy = -1; e.preventDefault(); }
-        if ((e.key === "ArrowDown" || e.key === "s" || e.key === "S") && dy === 0) { nextDx = 0; nextDy = 1; e.preventDefault(); }
-        if ((e.key === "ArrowLeft" || e.key === "a" || e.key === "A") && dx === 0) { nextDx = -1; nextDy = 0; e.preventDefault(); }
-        if ((e.key === "ArrowRight" || e.key === "d" || e.key === "D") && dx === 0) { nextDx = 1; nextDy = 0; e.preventDefault(); }
+        if (!isPlaying && document.getElementById("menu-overlay").classList.contains("hidden") == false) return;
+        if ((e.key === "ArrowUp" || e.key === "w") && dy === 0) { nextDx = 0; nextDy = -1; e.preventDefault(); }
+        if ((e.key === "ArrowDown" || e.key === "s") && dy === 0) { nextDx = 0; nextDy = 1; e.preventDefault(); }
+        if ((e.key === "ArrowLeft" || e.key === "a") && dx === 0) { nextDx = -1; nextDy = 0; e.preventDefault(); }
+        if ((e.key === "ArrowRight" || e.key === "d") && dx === 0) { nextDx = 1; nextDy = 0; e.preventDefault(); }
     });
 
     function gameLoop() {
         dx = nextDx; dy = nextDy;
         let head = { x: snake[0].x + dx, y: snake[0].y + dy };
 
-        // Duvar Kontrolleri
-        if (gameSettings.mode === 0) { // Klasik
-            if (head.x < 0 || head.x >= gridSize || head.y < 0 || head.y >= gridSize) {
+        // Sınır ve Mod Kontrolleri
+        let minLimit = activeShrink;
+        let maxLimit = gridSize - 1 - activeShrink;
+
+        if (settings.mode === 'classic' || settings.mode === 'shrinking' || settings.mode === 'combat') {
+            if (head.x < minLimit || head.x > maxLimit || head.y < minLimit || head.y > maxLimit) {
+                if (tryMatrixSave()) return; // 2. Kural: Matrix Kurtarış Şansı
                 triggerGameOver();
                 return;
             }
-        } else { // Duvar Geçme
-            head.x = (head.x + gridSize) % gridSize;
-            head.y = (head.y + gridSize) % gridSize;
         }
 
-        // Kendi Kendine Çarpma
+        // Kendine çarpma
         for (let part of snake) {
             if (head.x === part.x && head.y === part.y) {
+                if (tryMatrixSave()) return;
                 triggerGameOver();
                 return;
             }
@@ -440,80 +358,137 @@
 
         snake.unshift(head);
 
-        // Yem Kontrolü
+        // Yem Yeme Kontrolü
         if (head.x === food.x && head.y === food.y) {
-            score += 10;
-            updateScoreDisplay();
-            showToast("+10 BONUS");
+            score += food.type === 'special' ? 30 : 10;
+            if (food.type === 'special') {
+                applyMetabolismEffect();
+            }
+            updateScore();
             spawnFood();
         } else {
             snake.pop();
         }
 
+        // 4. Kural: Shrinking Modu (Daralan Sahne)
+        if (settings.mode === 'shrinking') {
+            borderShrinkTimer++;
+            if (borderShrinkTimer > 35 && activeShrink < 4) {
+                activeShrink++;
+                borderShrinkTimer = 0;
+                showToast("ARENA SHRANK!");
+            }
+        }
+
+        // 5. Kural: Combat Modu (Düşmanlar)
+        if (settings.mode === 'combat' && Math.random() < 0.05 && enemies.length < 3) {
+            enemies.push({
+                x: Math.floor(Math.random() * gridSize),
+                y: Math.floor(Math.random() * gridSize)
+            });
+        }
+
+        // Düşman Çarpışma Kontrolü
+        enemies.forEach((en, idx) => {
+            if (head.x === en.x && head.y === en.y) {
+                enemies.splice(idx, 1);
+                score += 50;
+                showToast("ENEMY DESTROYED!");
+            }
+        });
+
         draw();
     }
 
-    function draw() {
-        ctx.fillStyle = "#050508";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // Hafif Izgara Çizgileri
-        ctx.strokeStyle = "#101018";
-        ctx.lineWidth = 1;
-        for (let i = 0; i < gridSize; i++) {
-            ctx.beginPath();
-            ctx.moveTo(i * blockSize, 0);
-            ctx.lineTo(i * blockSize, 480);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(0, i * blockSize);
-            ctx.lineTo(480, i * blockSize);
-            ctx.stroke();
+    // 2. Kural: Matrix Şansı (Ölmek üzereyken %15 ihtimalle rastgele güvenli bir yöne kaydırır)
+    function tryMatrixSave() {
+        if (!matrixChanceUsed && Math.random() < 0.15) {
+            matrixChanceUsed = true;
+            showToast("CRITICAL SAVE! MATRIX ACTIVE");
+            // Güvenli bir hamle bul
+            const safeDirs = [{x:0, y:-1}, {x:0, y:1}, {x:-1, y:0}, {x:1, y:0}];
+            for (let d of safeDirs) {
+                let testHead = { x: snake[0].x + d.x, y: snake[0].y + d.y };
+                if (testHead.x >= 0 && testHead.x < gridSize && testHead.y >= 0 && testHead.y < gridSize) {
+                    dx = d.x; dy = d.y;
+                    nextDx = d.x; nextDy = d.y;
+                    snake.unshift(testHead);
+                    snake.pop();
+                    return true;
+                }
+            }
         }
-
-        let palette = colorPalettes[gameSettings.color];
-
-        // Yemi Çiz (Parlak neon nokta)
-        ctx.shadowColor = "#ff0055";
-        ctx.shadowBlur = 12;
-        ctx.fillStyle = "#ff0055";
-        ctx.beginPath();
-        let fx = food.x * blockSize + blockSize / 2;
-        let fy = food.y * blockSize + blockSize / 2;
-        ctx.arc(fx, fy, blockSize / 2.5, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.shadowBlur = 0; // Gölgeyi sıfırla
-
-        // Yılanı Çiz
-        snake.forEach((part, index) => {
-            ctx.fillStyle = index === 0 ? palette.head : palette.body;
-            let rx = part.x * blockSize + 1;
-            let ry = part.y * blockSize + 1;
-            let rw = blockSize - 2;
-            let rh = blockSize - 2;
-            
-            // Yuvarlatılmış yumuşak bloklar
-            ctx.beginPath();
-            ctx.roundRect(rx, ry, rw, rh, 4);
-            ctx.fill();
-        });
+        return false;
     }
 
-    function updateScoreDisplay() {
-        document.getElementById("score-display").innerText = String(score).padStart(4, '0');
+    // 3. Kural: Metabolizma Efektleri
+    function applyMetabolismEffect() {
+        const effects = ["SPEED BOOST", "BODY SHRINK", "BONUS POINTS"];
+        let choice = effects[Math.floor(Math.random() * effects.length)];
+        showToast(choice);
+        if (choice === "BODY SHRINK" && snake.length > 3) {
+            snake.pop();
+            snake.pop();
+        }
     }
 
     function showToast(text) {
-        let toast = document.getElementById("toast");
-        toast.innerText = text;
-        toast.classList.add("show");
-        setTimeout(() => toast.classList.remove("show"), 800);
+        let t = document.getElementById("toast");
+        t.innerText = text; t.classList.add("show");
+        setTimeout(() => t.classList.remove("show"), 1000);
+    }
+
+    function updateScore() {
+        document.getElementById("score-display").innerText = String(score).padStart(4, '0');
+    }
+
+    function draw() {
+        ctx.fillStyle = "#040406";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Daralan Sınırları Çiz
+        if (activeShrink > 0) {
+            ctx.strokeStyle = "rgba(255,0,127,0.4)";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(activeShrink * blockSize, activeShrink * blockSize, (gridSize - activeShrink * 2) * blockSize, (gridSize - activeShrink * 2) * blockSize);
+        }
+
+        // Yem Çizimi
+        ctx.fillStyle = food.type === 'special' ? '#ff9900' : '#ff0055';
+        ctx.fillRect(food.x * blockSize + 2, food.y * blockSize + 2, blockSize - 4, blockSize - 4);
+
+        // Düşmanlar
+        ctx.fillStyle = '#aa00ff';
+        enemies.forEach(en => {
+            ctx.fillRect(en.x * blockSize + 2, en.y * blockSize + 2, blockSize - 4, blockSize - 4);
+        });
+
+        // 1. Kural: Fluid Wave (Pürüzsüz Eğrisel Akış) veya Grid Snap
+        let palette = palettes[settings.color];
+        if (settings.physics === 'fluid') {
+            ctx.strokeStyle = palette.head;
+            ctx.lineWidth = blockSize - 6;
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+            ctx.beginPath();
+            snake.forEach((pt, i) => {
+                let px = pt.x * blockSize + blockSize / 2;
+                let py = pt.y * blockSize + blockSize / 2;
+                if (i === 0) ctx.moveTo(px, py);
+                else ctx.lineTo(px, py);
+            });
+            ctx.stroke();
+        } else {
+            snake.forEach((part, index) => {
+                ctx.fillStyle = index === 0 ? palette.head : palette.body;
+                ctx.fillRect(part.x * blockSize + 1, part.y * blockSize + 1, blockSize - 2, blockSize - 2);
+            });
+        }
     }
 
     function triggerGameOver() {
-        isPlaying = false;
         clearInterval(gameInterval);
-        document.getElementById("final-score").innerText = `${langData[currentLang].scoreText} ${score}`;
+        document.getElementById("final-score").innerText = `SCORE: ${score}`;
         document.getElementById("game-over-panel").style.display = "flex";
     }
 
