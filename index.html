@@ -367,6 +367,15 @@
             }
         }
 
+        // Düşman Çarpışma Kontrolü (Düşman sana değerse ölürsün)
+        for (let en of enemies) {
+            if (head.x === en.x && head.y === en.y) {
+                if (tryMatrixSave()) return;
+                triggerGameOver();
+                return;
+            }
+        }
+
         snake.unshift(head);
 
         if (head.x === food.x && head.y === food.y) {
@@ -387,20 +396,35 @@
             }
         }
 
-        if (settings.mode === 'combat' && Math.random() < 0.08 && enemies.length < 3) {
-            enemies.push({
-                x: Math.floor(Math.random() * (gridSize - 2)) + 1,
-                y: Math.floor(Math.random() * (gridSize - 2)) + 1
+        // Combat Modunda Akıllı Düşman Üretimi ve Takip Mantığı
+        if (settings.mode === 'combat') {
+            if (Math.randomStr = Math.random() < 0.1 && enemies.length < 3) {
+                enemies.push({
+                    x: Math.random() < 0.5 ? activeShrink : maxLimit,
+                    y: Math.floor(Math.random() * gridSize)
+                });
+            }
+
+            // Düşmanlar yılanın kafasına doğru yavaşça hareket eder
+            enemies.forEach(en => {
+                if (en.x < snake[0].x) en.x++;
+                else if (en.x > snake[0].x) en.x--;
+                
+                if (en.y < snake[0].y) en.y++;
+                else if (en.y > snake[0].y) en.y--;
             });
         }
 
+        // Düşmanın kendi kuyruğuna çarpıp yok olması
         enemies.forEach((en, idx) => {
-            if (head.x === en.x && head.y === en.y) {
-                enemies.splice(idx, 1);
-                score += 50;
-                updateScore();
-                showToast("ENEMY DESTROYED!");
-            }
+            snake.forEach(part => {
+                if (en.x === part.x && en.y === part.y) {
+                    enemies.splice(idx, 1);
+                    score += 50;
+                    updateScore();
+                    showToast("ENEMY DESTROYED BY TAIL!");
+                }
+            });
         });
 
         draw();
@@ -459,14 +483,14 @@
         ctx.fillStyle = food.type === 'special' ? '#ff9900' : '#ff0055';
         ctx.fillRect(food.x * blockSize + 2, food.y * blockSize + 2, blockSize - 4, blockSize - 4);
 
-        // Düşmanlar (Parlak Neon Mor Tehdit Küpleri)
+        // Takip Eden Düşmanlar (Parlak Neon Mor)
         ctx.shadowColor = "#bf00ff";
-        ctx.shadowBlur = 10;
+        ctx.shadowBlur = 12;
         ctx.fillStyle = "#bf00ff";
         enemies.forEach(en => {
             ctx.fillRect(en.x * blockSize + 2, en.y * blockSize + 2, blockSize - 4, blockSize - 4);
         });
-        ctx.shadowBlur = 0; // Gölgeyi sıfırla
+        ctx.shadowBlur = 0;
 
         let palette = palettes[settings.color];
         if (settings.physics === 'fluid') {
