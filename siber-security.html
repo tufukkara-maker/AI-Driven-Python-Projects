@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CYBER // PASSWORD ANALYZER</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=VT323&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #060609;
+            --panel-bg: #101018;
+            --border-col: #1e1e2f;
+            --text-main: #e2e2ef;
+            --accent-green: #00ffcc;
+            --accent-blue: #00bfff;
+            --accent-pink: #ff007f;
+            --accent-orange: #ff9900;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Space Grotesk', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            background-image: linear-gradient(rgba(12, 12, 20, 0) 50%, rgba(0, 0, 0, 0.3) 50%);
+            background-size: 100% 4px;
+        }
+
+        .container {
+            width: 450px;
+            background: var(--panel-bg);
+            border: 3px solid var(--border-col);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.9), inset 0 0 40px rgba(0,0,0,0.6);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+        .header span { color: var(--accent-green); font-family: 'VT323', monospace; font-size: 16px; }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: relative;
+        }
+
+        label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #8888a0;
+        }
+
+        .password-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        input[type="password"], input[type="text"] {
+            width: 100%;
+            background: #151520;
+            border: 1px solid var(--border-col);
+            color: var(--text-main);
+            padding: 12px 14px;
+            border-radius: 8px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus { border-color: var(--accent-green); }
+
+        .toggle-btn {
+            position: absolute;
+            right: 12px;
+            background: none;
+            border: none;
+            color: #8888a0;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .toggle-btn:hover { color: #fff; }
+
+        /* Güç Barı */
+        .strength-meter {
+            height: 6px;
+            width: 100%;
+            background: #151520;
+            border-radius: 3px;
+            overflow: hidden;
+            display: flex;
+            gap: 4px;
+        }
+
+        .meter-bar {
+            flex: 1;
+            background: #222233;
+            transition: background 0.3s ease;
+        }
+
+        .status-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'VT323', monospace;
+            font-size: 20px;
+            letter-spacing: 1px;
+        }
+
+        #security-level { color: var(--accent-pink); }
+
+        /* Öneriler ve Kriterler Listesi */
+        .criteria-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            background: #0b0b10;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-col);
+        }
+
+        .criterion {
+            font-size: 12px;
+            color: #666680;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.2s;
+        }
+
+        .criterion.met { color: var(--accent-green); }
+        .criterion::before { content: "✕"; font-weight: bold; }
+        .criterion.met::before { content: "✓"; }
+
+        /* Butonlar */
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            flex: 1;
+            background: #151520;
+            border: 1px solid var(--border-col);
+            color: var(--text-main);
+            padding: 10px;
+            border-radius: 8px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .btn:hover { border-color: #555; background: #202030; }
+        .btn.primary {
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+            color: #000;
+            border: none;
+            font-weight: 700;
+            box-shadow: 0 5px 15px rgba(0,191,255,0.2);
+        }
+        .btn.primary:hover { transform: translateY(-1px); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>PASS // ANALYZER</h1>
+        <span>CYBERSECURITY TOOLKIT</span>
+    </div>
+
+    <div class="input-group">
+        <label>Şifrenizi Girin</label>
+        <div class="password-wrapper">
+            <input type="password" id="passwordInput" placeholder="Güvenlik anahtarınızı yazın..." oninput="analyzePassword()">
+            <button class="toggle-btn" onclick="toggleVisibility()">GÖSTER</button>
+        </div>
+    </div>
+
+    <div class="status-box">
+        <span>GÜVENLİK DERECESİ:</span>
+        <span id="security-level">ANALİZ EDİLİYOR...</span>
+    </div>
+
+    <div class="strength-meter">
+        <div class="meter-bar" id="bar1"></div>
+        <div class="meter-bar" id="bar2"></div>
+        <div class="meter-bar" id="bar3"></div>
+        <div class="meter-bar" id="bar4"></div>
+    </div>
+
+    <div class="criteria-list">
+        <div class="criterion" id="crit-length">En az 8 karakter uzunluğunda</div>
+        <div class="criterion" id="crit-upper">Büyük harf (A-Z) içeriyor</div>
+        <div class="criterion" id="crit-lower">Küçük harf (a-z) içeriyor</div>
+        <div class="criterion" id="crit-number">Rakam (0-9) içeriyor</div>
+        <div class="criterion" id="crit-symbol">Özel karakter (!@#$...) içeriyor</div>
+    </div>
+
+    <div class="action-buttons">
+        <button class="btn primary" onclick="generatePassword()">GÜÇLÜ ŞİFRE OLUŞTUR</button>
+        <button class="btn" onclick="copyPassword()">KOPYALA</button>
+    </div>
+</div>
+
+<script>
+    function analyzePassword() {
+        const pwd = document.getElementById("passwordInput").value;
+        
+        const hasLength = pwd.length >= 8;
+        const hasUpper = /[A-Z]/.test(pwd);
+        const hasLower = /[a-z]/.test(pwd);
+        const hasNumber = /[0-9]/.test(pwd);
+        const hasSymbol = /[^A-Za-z0-9]/.test(pwd);
+
+        updateCriterion("crit-length", hasLength);
+        updateCriterion("crit-upper", hasUpper);
+        updateCriterion("crit-lower", hasLower);
+        updateCriterion("crit-number", hasNumber);
+        updateCriterion("crit-symbol", hasSymbol);
+
+        let score = 0;
+        if (hasLength) score++;
+        if (hasUpper) score++;
+        if (hasLower) score++;
+        if (hasNumber) score++;
+        if (hasSymbol) score++;
+
+        updateMeterAndStatus(pwd.length, score);
+    }
+
+    function updateCriterion(id, isMet) {
+        const el = document.getElementById(id);
+        if (isMet) {
+            el.classList.add("met");
+        } else {
+            el.classList.remove("met");
+        }
+    }
+
+    function updateMeterAndStatus(length, score) {
+        const levelEl = document.getElementById("security-level");
+        const bars = [
+            document.getElementById("bar1"),
+            document.getElementById("bar2"),
+            document.getElementById("bar3"),
+            document.getElementById("bar4")
+        ];
+
+        // Renkleri sıfırla
+        bars.forEach(b => b.style.background = "#222233");
+
+        if (length === 0) {
+            levelEl.innerText = "BEKLENİYOR";
+            levelEl.style.color = "#8888a0";
+            return;
+        }
+
+        let activeBars = 0;
+        let text = "ÇOK ZAYIF";
+        let color = "#ff007f";
+
+        if (score <= 2) {
+            activeBars = 1;
+            text = "ZAYIF";
+            color = "#ff007f";
+        } else if (score === 3 || score === 4) {
+            activeBars = 3;
+            text = "ORTA";
+            color = "#ff9900";
+        } else if (score === 5 && length >= 12) {
+            activeBars = 4;
+            text = "KUSURSUZ";
+            color = "#00ffcc";
+        } else if (score === 5) {
+            activeBars = 3;
+            text = "GÜÇLÜ";
+            color = "#00bfff";
+        }
+
+        levelEl.innerText = text;
+        levelEl.style.color = color;
+
+        for (let i = 0; i < activeBars; i++) {
+            bars[i].style.background = color;
+        }
+    }
+
+    function toggleVisibility() {
+        const input = document.getElementById("passwordInput");
+        const btn = document.querySelector(".toggle-btn");
+        if (input.type === "password") {
+            input.type = "text";
+            btn.innerText = "GİZLE";
+        } else {
+            input.type = "password";
+            btn.innerText = "GÖSTER";
+        }
+    }
+
+    function generatePassword() {
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*!+=?";
+        let pwd = "";
+        // Garanti olsun diye her kategoriden en az birer tane koyuyoruz
+        pwd += "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[Math.floor(Math.random() * 26)];
+        pwd += "abcdefghijklmnopqrstuvwxyz"[Math.floor(Math.random() * 26)];
+        pwd += "0123456789"[Math.floor(Math.random() * 10)];
+        pwd += "@#$%&*!+=?"[Math.floor(Math.random() * 10)];
+
+        // Kalan karakterleri rastgele tamamla (toplam 14 karakter)
+        for (let i = 4; i < 14; i++) {
+            pwd += chars[Math.floor(Math.random() * chars.length)];
+        }
+
+        // Karıştır
+        pwd = pwd.split('').sort(() => 0.5 - Math.random()).join('');
+
+        const input = document.getElementById("passwordInput");
+        input.type = "text";
+        document.querySelector(".toggle-btn").innerText = "GİZLE";
+        input.value = pwd;
+        analyzePassword();
+    }
+
+    function copyPassword() {
+        const input = document.getElementById("passwordInput");
+        if (!input.value) return;
+        navigator.clipboard.writeText(input.value);
+        alert("Şifre panoya kopyalandı!");
+    }
+</script>
+
+</body>
+</html>
